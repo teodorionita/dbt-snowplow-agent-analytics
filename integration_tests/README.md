@@ -12,16 +12,21 @@ A standalone dbt project that installs the package from `../`, seeds a fixed eve
 | `models/actual/*_actual.sql` | One per output model; float columns rounded. |
 | `models/expected/*_expected_stg.sql` | Reads the expected seed, rounds identically. |
 | `models/actual/actual_vs_expected.yml` | `dbt_utils.equal_rowcount` + `dbt_utils.equality` per model. |
-| `.scripts/integration_tests.sh` | Seed, run 6×, test. |
+| `.scripts/integration_tests.sh` | Seed, build the source stage, run four incremental batches, test. |
 | `.scripts/bootstrap_expected.sh` | Regenerate `data/expected/` from a built run. |
 | `.scripts/verify_fixture.py` | Reimplements the marts in Python and prints the coverage the fixture is designed for. |
 
 ## Running
 
+The `pr_tests` GitHub Actions workflow runs this suite for branches in the package
+repository and supports manual runs. Each run uses its own schema suffix and cleans up
+afterwards. Fork PRs need a maintainer to test a reviewed branch in the package repository,
+where the Snowflake secrets are available.
+
 ```bash
 cd integration_tests
 export DBT_PROFILES_DIR=$PWD/ci     # or add an `integration_tests` profile to ~/.dbt
-export SNOWFLAKE_TEST_ACCOUNT=... SNOWFLAKE_TEST_USER=... SNOWFLAKE_TEST_PASSWORD=...
+export SNOWFLAKE_TEST_ACCOUNT=... SNOWFLAKE_TEST_USER=... SNOWFLAKE_TEST_PRIVATE_KEY=...
 export SNOWFLAKE_TEST_ROLE=... SNOWFLAKE_TEST_DATABASE=... SNOWFLAKE_TEST_WAREHOUSE=...
 export SCHEMA_SUFFIX=$USER
 

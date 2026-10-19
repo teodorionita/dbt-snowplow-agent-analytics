@@ -97,8 +97,19 @@ no-op by itself once the enrichment handles the agent.
 
 Set under `vars: snowplow_agent_analytics:` in your project:
 
+Set `snowplow__license_accepted: true` to confirm that you accept the
+[Snowplow Personal and Academic License](https://docs.snowplow.io/personal-and-academic-license-1.0/)
+or have a commercial agreement with Snowplow:
+
+```yaml
+vars:
+  snowplow_agent_analytics:
+    snowplow__license_accepted: true
+```
+
 | Var | Default | Description |
 |-----|---------|-------------|
+| `snowplow__license_accepted` | `false` | Accept the Snowplow license or confirm a commercial agreement before running the package |
 | `snowplow__atomic_schema` | `atomic` | Schema holding the Snowplow events table |
 | `snowplow__events_table` | `events` | Events table name |
 | `snowplow__database` | `target.database` | Database holding the events table |
@@ -129,7 +140,7 @@ to map; list those in `operators_without_referrals` to exempt them from the warn
 
 ```bash
 dbt deps
-dbt seed
+dbt seed --select snowplow_agent_analytics --full-refresh
 dbt run
 dbt test
 ```

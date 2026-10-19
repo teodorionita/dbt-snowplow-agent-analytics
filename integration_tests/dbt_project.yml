@@ -193,6 +193,8 @@ seeds:
 
 vars:
   snowplow_agent_analytics:
+    snowplow__license_accepted: true
+
     # The redirect to the seeded + parse_json'd stg model is NOT done here. The package's
     # sources.yml branches on project_name and composes target.schema inline, because var()
     # substitutes a variable's raw text without re-rendering the Jinja inside it -- passing
