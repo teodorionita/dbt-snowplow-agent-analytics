@@ -9,9 +9,9 @@
 
 with dates as (
   select event_date from {{ ref('agent_pageviews_daily') }}
-  union
+  union distinct
   select event_date from {{ ref('human_pageviews_daily') }}
-  union
+  union distinct
   select event_date from {{ ref('human_referrals_daily') }}
 )
 

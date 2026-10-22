@@ -104,6 +104,11 @@ jobs:
       - name: Run tests
         run: bash .scripts/integration_tests.sh -d ${{ matrix.warehouse }}
 
+      - name: Build portable dimensions
+        if: matrix.warehouse != 'snowflake'
+        run: |
+          dbt run --target ${{ matrix.warehouse }} --select dim_date dim_page dim_operator --vars '{enable_semantic_views: true}'
+
       # post_ci_cleanup sits in utils package
       - name: "Post-test: Drop ci schemas"
         if: ${{ always() && steps.connection.outcome == 'success' }}
