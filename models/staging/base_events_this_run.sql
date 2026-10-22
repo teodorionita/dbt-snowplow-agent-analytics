@@ -94,7 +94,7 @@ enriched_events as (
     bot_detection.bot as com_snowplowanalytics_snowplow_bot_detection_1_bot,
     utm_referrer.source as com_snowplowanalytics_snowplow_utm_referrer_1_source,
     utm_referrer.medium as com_snowplowanalytics_snowplow_utm_referrer_1_medium
-  from {{ 'enriched_events' if target.type == 'redshift' else 'raw_events' }} ev
+  from raw_events ev
   left join yauaa_entity yauaa
     on ev.event_id = yauaa.root_id and ev.collector_tstamp = yauaa.root_tstamp
   left join agent_classification_entity agent_classification
