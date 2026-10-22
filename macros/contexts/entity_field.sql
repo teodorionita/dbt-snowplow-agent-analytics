@@ -4,6 +4,10 @@
   {{ return(adapter.dispatch('entity_field', 'snowplow_agent_analytics')(table_alias, entity, field, snowflake_field, dtype)) }}
 {%- endmacro %}
 
+{% macro default__entity_field(table_alias, entity, field, snowflake_field, dtype) -%}
+  {{ snowplow_agent_analytics.check_warehouse() }}
+{%- endmacro %}
+
 {% macro snowflake__entity_field(table_alias, entity, field, snowflake_field, dtype) -%}
   {{ table_alias }}.contexts_{{ entity }}[0]:{{ snowflake_field }}::{{ dbt.type_string() if dtype == 'string' else 'boolean' }}
 {%- endmacro %}
