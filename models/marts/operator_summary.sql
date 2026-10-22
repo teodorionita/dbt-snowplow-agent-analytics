@@ -74,7 +74,7 @@ select
   coalesce(r.referred_sessions_30d, 0) as referred_sessions_30d,
   coalesce(r.referred_sessions_90d, 0) as referred_sessions_90d,
   coalesce(r.distinct_referred_pages_30d, 0) as distinct_referred_pages_30d,
-  {{ dbt_utils.safe_divide('cast(coalesce(c.crawl_hits_30d, 0) as ' ~ dbt.type_float() ~ ')', 'coalesce(r.referred_sessions_30d, 0)') }} as crawl_to_referral_ratio_30d,
+  {{ dbt_utils.safe_divide(('cast(coalesce(c.crawl_hits_30d, 0) as ' ~ dbt.type_float() ~ ')' if target.type == 'redshift' else 'coalesce(c.crawl_hits_30d, 0)'), 'coalesce(r.referred_sessions_30d, 0)') }} as crawl_to_referral_ratio_30d,
   c.first_crawl_tstamp, c.last_crawl_tstamp,
   r.first_referral_tstamp, r.last_referral_tstamp,
   (cast(least(coalesce(c.first_crawl_tstamp, r.first_referral_tstamp),

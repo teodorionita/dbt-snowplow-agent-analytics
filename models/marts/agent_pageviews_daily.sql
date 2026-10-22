@@ -1,6 +1,6 @@
-{# delete+insert on event_date gives partition-overwrite semantics on Snowflake:
-   each batch recomputes complete trailing days from base_events, deletes those
-   dates from the target, and inserts the fresh aggregates. #}
+{# Recompute complete dates from the durable base. BigQuery replaces date
+   partitions; other adapters delete+insert by event_date. This also removes
+   obsolete groups when an agent changes source channel. #}
 {{
   config(
     materialized='incremental',

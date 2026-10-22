@@ -1,8 +1,6 @@
-{# Snowflake's insert_overwrite truncates the whole table rather than replacing
-   partitions, so the partition-overwrite intent of the spec is implemented as
-   delete+insert keyed on event_id: reprocessed batches (manifest replays) delete
-   their prior copies before inserting, keeping the table idempotent. The
-   snowplow_optimize meta bounds the delete scan to the batch's load_tstamp range. #}
+{# Upsert by event_id so manifest replays replace prior copies. BigQuery and
+   Databricks use merge; Snowflake and Redshift use delete+insert. The
+   snowplow_optimize meta bounds the target scan to the batch's load_tstamp range. #}
 {# full_refresh guard: an accidental --full-refresh would truncate this table while
    the incremental manifest survives, so history would never be reprocessed. Refresh
    requires snowplow__allow_refresh (or the dev target), same as the manifest. #}

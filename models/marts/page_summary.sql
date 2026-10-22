@@ -77,7 +77,7 @@ select
   coalesce(r.ai_referral_sessions_30d, 0) as ai_referral_sessions_30d,
   (coalesce(a.agent_hits_30d, 0) >= {{ var('orphan_agent_hits_threshold', 10) }}
     and coalesce(h.human_pageviews_30d, 0) < {{ var('orphan_human_pageviews_threshold', 5) }}) as is_orphaned_agent_interest,
-  {{ dbt_utils.safe_divide('cast(coalesce(r.ai_referral_pageviews_30d, 0) as ' ~ dbt.type_float() ~ ')', 'coalesce(a.ai_user_fetch_hits_30d, 0) + coalesce(a.ai_search_index_hits_30d, 0)') }} as cite_through_rate_proxy_30d
+  {{ dbt_utils.safe_divide(('cast(coalesce(r.ai_referral_pageviews_30d, 0) as ' ~ dbt.type_float() ~ ')' if target.type == 'redshift' else 'coalesce(r.ai_referral_pageviews_30d, 0)'), 'coalesce(a.ai_user_fetch_hits_30d, 0) + coalesce(a.ai_search_index_hits_30d, 0)') }} as cite_through_rate_proxy_30d
 from agent_windowed a
 full outer join human_windowed h using (page_url_host_path)
 left join ai_referred r using (page_url_host_path)

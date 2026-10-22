@@ -96,7 +96,7 @@ recover the identity on its own. Two seeds handle this:
 
 | Seed | Purpose |
 |------|---------|
-| `agent_ua_overrides` | Repairs `agent_name` (and fills `operator` / `purpose`) by matching `useragent` with `ILIKE`. Add a row per misattributed crawler. |
+| `agent_ua_overrides` | Repairs `agent_name` (and fills `operator` / `purpose`) by matching `useragent` case-insensitively with `LIKE`. Add a row per misattributed crawler. |
 | `agent_name_ignore_list` | `agent_name` values too generic to identify anything. Excluded from `int_agent_source_lookup`, so they never reach the agent marts. |
 
 The ignore list is the failsafe for the override seed being incomplete: a masquerading UA
