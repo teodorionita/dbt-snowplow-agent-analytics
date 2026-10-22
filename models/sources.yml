@@ -12,3 +12,23 @@ sources:
       - name: events
         identifier: "{{ var('snowplow__events_table', 'events') if project_name != 'snowplow_agent_analytics_integration_tests' else 'snowplow_agent_analytics_events_stg' }}"
         description: Snowplow atomic events table. Scanned exactly once per run, by base_events_this_run.
+
+      - name: yauaa
+        identifier: "{{ var('snowplow__yauaa_context', 'nl_basjes_yauaa_context_1') }}"
+        config:
+          enabled: "{{ target.type == 'redshift' }}"
+
+      - name: agent_classification
+        identifier: "{{ var('snowplow__agent_classification_context', 'com_snowplowanalytics_snowplow_agent_classification_1') }}"
+        config:
+          enabled: "{{ target.type == 'redshift' }}"
+
+      - name: bot_detection
+        identifier: "{{ var('snowplow__bot_detection_context', 'com_snowplowanalytics_snowplow_bot_detection_1') }}"
+        config:
+          enabled: "{{ target.type == 'redshift' }}"
+
+      - name: utm_referrer
+        identifier: "{{ var('snowplow__utm_referrer_context', 'com_snowplowanalytics_snowplow_utm_referrer_1') }}"
+        config:
+          enabled: "{{ target.type == 'redshift' }}"

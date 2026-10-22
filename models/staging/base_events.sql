@@ -9,7 +9,7 @@
 {{
   config(
     materialized='incremental',
-    incremental_strategy='delete+insert',
+    incremental_strategy=('merge' if target.type in ['bigquery', 'databricks'] else 'delete+insert'),
     unique_key='event_id',
     meta={'upsert_date_key': 'load_tstamp', 'snowplow_optimize': true},
     on_schema_change='append_new_columns',

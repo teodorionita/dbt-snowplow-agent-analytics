@@ -10,7 +10,7 @@
   config(
     materialized='incremental',
     unique_key='agent_name',
-    incremental_strategy='merge',
+    incremental_strategy=('delete+insert' if target.type == 'redshift' else 'merge'),
     full_refresh=snowplow_agent_analytics.allow_refresh(),
     tags=['snowplow_agent_analytics_incremental']
   )
@@ -31,8 +31,8 @@ with new_bot_agents as (
 agent_channels as (
   select
     agent_name,
-    boolor_agg(raw_source_channel = 'client') as seen_in_client,
-    boolor_agg(raw_source_channel = 'cdn') as seen_in_cdn,
+    (max(case when raw_source_channel = 'client' then 1 else 0 end) = 1) as seen_in_client,
+    (max(case when raw_source_channel = 'cdn' then 1 else 0 end) = 1) as seen_in_cdn,
     max(last_seen_tstamp) as last_seen_tstamp
   from new_bot_agents
   group by 1

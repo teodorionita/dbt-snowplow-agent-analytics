@@ -37,21 +37,21 @@ seeds:
     +schema: "snowplow_agent_analytics"
     operator_referral_sources:
       +column_types:
-        operator: varchar
-        source_value: varchar
-        medium_value: varchar
+        operator: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
+        source_value: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
+        medium_value: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
     agent_ua_overrides:
       +column_types:
-        ua_pattern: varchar
-        agent_name: varchar
-        agent_operator: varchar
-        agent_purpose: varchar
+        ua_pattern: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
+        agent_name: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
+        agent_operator: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
+        agent_purpose: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
     agent_name_ignore_list:
       +column_types:
-        agent_name: varchar
+        agent_name: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
     operators_without_referrals:
       +column_types:
-        operator: varchar
+        operator: '{{ "string" if target.type in ["bigquery", "databricks"] else "varchar" }}'
 
 vars:
   snowplow_agent_analytics:
