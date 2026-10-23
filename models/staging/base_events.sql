@@ -1,5 +1,5 @@
 {# Upsert by event_id so manifest replays replace prior copies. BigQuery and
-   Databricks use merge; Snowflake and Redshift use delete+insert. The
+   Databricks use merge; Snowflake uses delete+insert. The
    snowplow_optimize meta bounds the target scan to the batch's load_tstamp range. #}
 {# full_refresh guard: an accidental --full-refresh would truncate this table while
    the incremental manifest survives, so history would never be reprocessed. Refresh

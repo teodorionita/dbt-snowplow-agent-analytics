@@ -10,7 +10,7 @@
   config(
     materialized='incremental',
     unique_key='agent_name',
-    incremental_strategy=('delete+insert' if target.type == 'redshift' else 'merge'),
+    incremental_strategy='merge',
     full_refresh=snowplow_agent_analytics.allow_refresh(),
     tags=['snowplow_agent_analytics_incremental']
   )

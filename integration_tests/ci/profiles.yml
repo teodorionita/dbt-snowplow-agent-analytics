@@ -15,16 +15,6 @@ integration_tests:
       warehouse: "{{ env_var('SNOWFLAKE_TEST_WAREHOUSE') }}"
       schema: "gh_sp_agent_analytics_dbt_{{ env_var('SCHEMA_SUFFIX') }}"
       threads: 4
-    redshift:
-      type: redshift
-      host: "{{ env_var('REDSHIFT_TEST_HOST') }}"
-      user: "{{ env_var('REDSHIFT_TEST_USER') }}"
-      pass: "{{ env_var('REDSHIFT_TEST_PASS') }}"
-      dbname: "{{ env_var('REDSHIFT_TEST_DBNAME') }}"
-      port: "{{ env_var('REDSHIFT_TEST_PORT') | as_number }}"
-      schema: "gh_sp_agent_analytics_dbt_{{ env_var('SCHEMA_SUFFIX') }}"
-      threads: 4
-
     bigquery:
       type: bigquery
       method: service-account-json

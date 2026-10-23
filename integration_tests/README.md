@@ -8,7 +8,7 @@ A standalone dbt project that installs the package from `../`, seeds a fixed eve
 |------|---------|
 | `data/source/snowplow_agent_analytics_events.csv` | The event fixture. 1,476 rows, 133 atomic columns, seeded as scalars. |
 | `data/expected/*.csv` | Committed expected results, generated from a reviewed run — see below. |
-| `models/source/<warehouse>/` | Converts the same fixture into native entity shapes: Snowflake VARIANT, BigQuery repeated RECORDs, Databricks typed arrays, or Redshift shredded tables. |
+| `models/source/<warehouse>/` | Converts the same fixture into native entity shapes: Snowflake VARIANT, BigQuery repeated RECORDs, or Databricks typed arrays. |
 | `models/actual/*_actual.sql` | One per output model; float columns rounded. |
 | `models/expected/*_expected_stg.sql` | Reads the expected seed, rounds identically. |
 | `models/actual/actual_vs_expected.yml` | `dbt_utils.equal_rowcount` + `dbt_utils.equality` per model. |
@@ -21,7 +21,7 @@ A standalone dbt project that installs the package from `../`, seeds a fixed eve
 The `pr_tests` GitHub Actions workflow runs this suite for branches in the package
 repository and supports manual runs. Each run uses its own schema suffix and cleans up
 afterwards. Fork PRs need a maintainer to test a reviewed branch in the package repository,
-where the warehouse service credentials are available. The matrix covers Snowflake, BigQuery, Databricks, and Redshift.
+where the warehouse service credentials are available. The matrix covers Snowflake, BigQuery, and Databricks.
 
 ```bash
 cd integration_tests
@@ -31,7 +31,7 @@ export SNOWFLAKE_TEST_ROLE=... SNOWFLAKE_TEST_DATABASE=... SNOWFLAKE_TEST_WAREHO
 export SCHEMA_SUFFIX=$USER
 
 dbt deps
-bash .scripts/integration_tests.sh -d snowflake  # or bigquery, databricks, redshift
+bash .scripts/integration_tests.sh -d snowflake  # or bigquery, databricks
 ```
 
 ## Regenerating `data/expected/`

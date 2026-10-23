@@ -19,7 +19,7 @@ integration test fixture on every push to `main` (`.github/workflows/publish-gh-
 
 ## Requirements
 
-- **Warehouses:** Snowflake, BigQuery, Databricks, and Redshift
+- **Warehouses:** Snowflake, BigQuery, and Databricks
 - **Databricks:** dbt-databricks >= 1.11 with a SQL warehouse or Runtime 12.2 LTS or later; incremental tables use Delta
 - **dbt:** >= 1.10.6, < 2.0.0
 - **Packages:** [snowplow-utils](https://github.com/snowplow/dbt-snowplow-utils) >= 1.0.1 (incremental manifest), dbt-utils
@@ -38,17 +38,6 @@ Use the Snowplow loader's native events table, including `load_tstamp`:
 - Snowflake: VARIANT entity arrays with the existing field names.
 - BigQuery: repeated RECORD entities; snowplow-utils combines schema-version columns.
 - Databricks: typed arrays of structs with snake_case field names. Empty arrays return NULL.
-- Redshift: atomic events plus the four shredded entity tables in the same database/schema.
-  Entities join on both `root_id = event_id` and `root_tstamp = collector_tstamp`.
-
-Redshift entity table names can be overridden with these variables:
-
-| Variable | Default table |
-|----------|---------------|
-| `snowplow__yauaa_context` | `nl_basjes_yauaa_context_1` |
-| `snowplow__bot_detection_context` | `com_snowplowanalytics_snowplow_bot_detection_1` |
-| `snowplow__agent_classification_context` | `com_snowplowanalytics_snowplow_agent_classification_1` |
-| `snowplow__utm_referrer_context` | `com_snowplowanalytics_snowplow_utm_referrer_1` |
 
 The optional semantic view requires Snowflake. Conformed dimensions can also be built on
 other warehouses with `enable_semantic_views: true`, without the Snowflake materialization package.
@@ -68,7 +57,7 @@ Raw `atomic.events` is scanned **exactly once per run**:
    `is_bot` and `raw_source_channel`. It also resolves `agent_name` / `agent_operator` /
    `agent_purpose` (see [Agent identity](#agent-identity)).
 3. `base_events` receives the batch using `event_id` upserts (`merge` on BigQuery and
-   Databricks, `delete+insert` on Snowflake and Redshift). Everything downstream reads from
+   Databricks, `delete+insert` on Snowflake). Everything downstream reads from
    it or its pre-aggregated daily descendants. Daily models replace complete `event_date`
    groups: BigQuery uses partitioned `insert_overwrite`; the other adapters use `delete+insert`.
 4. The `on-run-end` hook advances the manifest **only for models that succeeded**, so a downstream

@@ -2,7 +2,7 @@
 set -o pipefail
 
 # Expected input:
-# -d (database) target database for dbt. snowflake, bigquery, databricks, or redshift.
+# -d (database) target database for dbt. snowflake, bigquery, or databricks.
 
 while getopts 'd:' opt
 do
@@ -11,7 +11,7 @@ do
   esac
 done
 
-declare -a SUPPORTED_DATABASES=("snowflake" "bigquery" "databricks" "redshift")
+declare -a SUPPORTED_DATABASES=("snowflake" "bigquery" "databricks")
 
 DATABASE="$(echo "$DATABASE" | tr '[:upper:]' '[:lower:]')"
 
@@ -27,7 +27,7 @@ for db in "${DATABASES[@]}"; do
 
   eval "dbt seed --target $db --full-refresh" || exit 1;
 
-  STG="path:models/source"
+  STG="snowplow_agent_analytics_events_stg"
 
   echo "snowplow_agent_analytics integration tests: Build source stage"
 

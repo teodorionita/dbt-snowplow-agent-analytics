@@ -14,13 +14,6 @@ env:
   DBT_PROFILES_DIR: ./ci
   DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
 
-  # Redshift Connection
-  REDSHIFT_TEST_HOST: ${{ secrets.REDSHIFT_TEST_HOST }}
-  REDSHIFT_TEST_USER: ${{ secrets.REDSHIFT_TEST_USER }}
-  REDSHIFT_TEST_PASS: ${{ secrets.REDSHIFT_TEST_PASS }}
-  REDSHIFT_TEST_DBNAME: ${{ secrets.REDSHIFT_TEST_DBNAME }}
-  REDSHIFT_TEST_PORT: ${{ secrets.REDSHIFT_TEST_PORT }}
-
   # BigQuery Connection
   BIGQUERY_TEST_DATABASE: ${{ secrets.BIGQUERY_TEST_DATABASE }}
   BIGQUERY_LOCATION: ${{ secrets.BIGQUERY_LOCATION }}
@@ -63,7 +56,7 @@ jobs:
       fail-fast: false
       matrix:
         dbt_version: ["1.*"]
-        warehouse: [bigquery, snowflake, databricks, redshift]
+        warehouse: [bigquery, snowflake, databricks]
 
     steps:
       - name: Check out

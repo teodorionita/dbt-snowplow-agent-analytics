@@ -45,67 +45,6 @@ with raw_events as (
   {{ base_events_query }}
 ),
 
-{% if target.type == 'redshift' %}
-yauaa_entity as (
-  select ent.*
-  from {{ source('snowplow', 'yauaa') }} ent
-  inner join (select distinct event_id, collector_tstamp from raw_events) ev
-    on ent.root_id = ev.event_id and ent.root_tstamp = ev.collector_tstamp
-  qualify row_number() over (
-    partition by ent.root_id, ent.root_tstamp
-    order by ent.agent_name
-  ) = 1
-),
-agent_classification_entity as (
-  select ent.*
-  from {{ source('snowplow', 'agent_classification') }} ent
-  inner join (select distinct event_id, collector_tstamp from raw_events) ev
-    on ent.root_id = ev.event_id and ent.root_tstamp = ev.collector_tstamp
-  qualify row_number() over (
-    partition by ent.root_id, ent.root_tstamp
-    order by ent.operator, ent.purpose
-  ) = 1
-),
-bot_detection_entity as (
-  select ent.*
-  from {{ source('snowplow', 'bot_detection') }} ent
-  inner join (select distinct event_id, collector_tstamp from raw_events) ev
-    on ent.root_id = ev.event_id and ent.root_tstamp = ev.collector_tstamp
-  qualify row_number() over (
-    partition by ent.root_id, ent.root_tstamp
-    order by ent.bot
-  ) = 1
-),
-utm_referrer_entity as (
-  select ent.*
-  from {{ source('snowplow', 'utm_referrer') }} ent
-  inner join (select distinct event_id, collector_tstamp from raw_events) ev
-    on ent.root_id = ev.event_id and ent.root_tstamp = ev.collector_tstamp
-  qualify row_number() over (
-    partition by ent.root_id, ent.root_tstamp
-    order by ent.source, ent.medium
-  ) = 1
-),
-enriched_events as (
-  select ev.*,
-    yauaa.agent_name as nl_basjes_yauaa_context_1_agent_name,
-    agent_classification.operator as com_snowplowanalytics_snowplow_agent_classification_1_operator,
-    agent_classification.purpose as com_snowplowanalytics_snowplow_agent_classification_1_purpose,
-    bot_detection.bot as com_snowplowanalytics_snowplow_bot_detection_1_bot,
-    utm_referrer.source as com_snowplowanalytics_snowplow_utm_referrer_1_source,
-    utm_referrer.medium as com_snowplowanalytics_snowplow_utm_referrer_1_medium
-  from raw_events ev
-  left join yauaa_entity yauaa
-    on ev.event_id = yauaa.root_id and ev.collector_tstamp = yauaa.root_tstamp
-  left join agent_classification_entity agent_classification
-    on ev.event_id = agent_classification.root_id and ev.collector_tstamp = agent_classification.root_tstamp
-  left join bot_detection_entity bot_detection
-    on ev.event_id = bot_detection.root_id and ev.collector_tstamp = bot_detection.root_tstamp
-  left join utm_referrer_entity utm_referrer
-    on ev.event_id = utm_referrer.root_id and ev.collector_tstamp = utm_referrer.root_tstamp
-),
-{% endif %}
-
 source_events as (
   select
     e.*,
@@ -114,7 +53,7 @@ source_events as (
       when {{ snowplow_agent_analytics.app_id_filter('e.app_id', cdn_app_ids) or 'false' }} then 'cdn'
       when e.platform = 'web' then 'client'
     end as raw_source_channel
-  from {{ 'enriched_events' if target.type == 'redshift' else 'raw_events' }} e
+  from raw_events e
 ),
 
 -- Dedup within the batch. The client-side pass is
