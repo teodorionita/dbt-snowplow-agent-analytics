@@ -9,11 +9,46 @@
     materialized='incremental',
     incremental_strategy=('merge' if target.type in ['bigquery', 'databricks'] else 'delete+insert'),
     unique_key='event_id',
-    meta={'upsert_date_key': 'load_tstamp', 'snowplow_optimize': true},
+    partition_by=snowplow_utils.get_value_by_target_type(
+      bigquery_val={'field': 'load_tstamp', 'data_type': 'timestamp'},
+      databricks_val='load_tstamp_date'
+    ),
+    meta={'upsert_date_key': ('load_tstamp_date' if target.type == 'databricks' else 'load_tstamp'), 'snowplow_optimize': true},
     on_schema_change='append_new_columns',
     full_refresh=snowplow_agent_analytics.allow_refresh(),
     tags=['snowplow_agent_analytics_incremental']
   )
 }}
 
-select * from {{ ref('base_events_this_run') }}
+{%- if is_incremental() -%}
+  {%- set columns = adapter.get_columns_in_relation(this) | map(attribute='name') | map('lower') | list -%}
+  {%- if 'utm_source' not in columns or 'utm_medium' not in columns or 'load_tstamp_date' not in columns -%}
+    {{ exceptions.raise_compiler_error(
+      "Agent Analytics base_events needs a coordinated package rebuild to populate extracted entity fields. "
+      ~ "Follow the README upgrade instructions: retain source history, then run the whole package with "
+      ~ "--full-refresh and snowplow__allow_refresh: true. Do not refresh base_events alone."
+    ) }}
+  {%- endif -%}
+{%- endif -%}
+
+select
+  event_id,
+  event_fingerprint,
+  app_id,
+  collector_tstamp,
+  derived_tstamp,
+  load_tstamp,
+  load_tstamp_date,
+  domain_sessionid,
+  page_urlhost,
+  page_urlpath,
+  refr_source,
+  refr_medium,
+  utm_source,
+  utm_medium,
+  is_bot,
+  raw_source_channel,
+  agent_name,
+  agent_operator,
+  agent_purpose
+from {{ ref('base_events_this_run') }}

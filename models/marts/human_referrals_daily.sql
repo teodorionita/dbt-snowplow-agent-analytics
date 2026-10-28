@@ -31,9 +31,9 @@ select
   max(e.derived_tstamp) as last_seen_tstamp
 from {{ ref('base_events') }} e
 join {{ ref('operator_referral_sources') }} s
-  on lower(coalesce({{ utm_source_from_entity('e') }}, e.refr_source)) = lower(s.source_value)
+  on lower(coalesce(e.utm_source, e.refr_source)) = lower(s.source_value)
  and (s.medium_value is null
-      or lower(coalesce({{ utm_medium_from_entity('e') }}, e.refr_medium)) = lower(s.medium_value))
+      or lower(coalesce(e.utm_medium, e.refr_medium)) = lower(s.medium_value))
 where e.is_bot = false
   and e.raw_source_channel = 'client'
   and date(e.derived_tstamp) >= {{ dbt_start_date() }}
@@ -43,7 +43,7 @@ where e.is_bot = false
     -- days far older than the trailing window, and anchoring on current_date alone
     -- would silently drop them from this table.
     and date(e.derived_tstamp) >= least(
-      cast({{ dbt.dateadd('day', -var('late_data_window_days', 3), 'current_date') }} as date),
+      cast({{ dbt.dateadd('day', -(var('late_data_window_days', 3) | int), 'current_date') }} as date),
       coalesce((select min(date(derived_tstamp)) from {{ base_events_this_run }}), current_date)
     )
   {% endif %}

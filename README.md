@@ -39,8 +39,8 @@ Use the Snowplow loader's native events table, including `load_tstamp`:
 - BigQuery: repeated RECORD entities; snowplow-utils combines schema-version columns.
 - Databricks: typed arrays of structs with snake_case field names. Empty arrays return NULL.
 
-The optional semantic view requires Snowflake. Conformed dimensions can also be built on
-other warehouses with `enable_semantic_views: true`, without the Snowflake materialization package.
+The optional semantic view and its conformed dimensions require Snowflake.
+`enable_semantic_views` has no effect on BigQuery or Databricks.
 
 ## Architecture
 
@@ -292,9 +292,34 @@ which drops rows (an operator that refers but never crawls becomes unreachable) 
 the other side, whose row repeats for every row it matches. A shared dimension gives all three
 tables the same grouping key and lets each metric aggregate within its own table before the join.
 
-`dim_date`, `dim_page` and `dim_operator` are portable SQL. The semantic view is gated on
-`target.type == 'snowflake'` in its `config()`, so on any other warehouse it is excluded at parse
-time rather than failing at run time.
+`dim_date`, `dim_page`, `dim_operator`, and the semantic view are enabled only on Snowflake.
+Databricks metric views are a separate integration and are not provided by this package.
+
+## Upgrade existing base tables
+
+The base layer stores a fixed set of scalar fields, including extracted UTM source and
+medium. BigQuery partitions `base_events` by `load_tstamp`; Databricks partitions by
+`load_tstamp_date` and uses that date for its incremental target predicate. Adding fields
+to an upstream entity does not change the durable table's schema.
+
+If you have run an earlier revision that stored raw entity columns, rebuild the whole
+package to populate the extracted fields for historical events. An incremental run stops
+with an upgrade error until this rebuild is performed. New installations need no extra step.
+
+Before rebuilding, back up the existing outputs and confirm that the source retains all
+history from `snowplow__start_date`. If it does not, preserve the existing tables and plan
+a migration before upgrading. A rebuild cannot recover events removed from the source.
+
+```bash
+dbt run --select snowplow_agent_analytics --full-refresh --vars '{snowplow__allow_refresh: true}'
+dbt run --select snowplow_agent_analytics
+dbt test --select snowplow_agent_analytics
+```
+
+Repeat the normal run until the manifest catches up: each run processes at most
+`snowplow__backfill_limit_days`. Validate the complete outputs before resuming downstream
+jobs. Never refresh `base_events` alone while retaining the old manifest or source lookup.
+The refresh permission is passed only to the rebuild command above.
 
 ## Known limitations
 

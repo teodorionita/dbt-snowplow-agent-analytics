@@ -3,7 +3,7 @@
 {{
   config(
     materialized='table',
-    enabled=var('enable_semantic_views', false)
+    enabled=(var('enable_semantic_views', false) and target.type == 'snowflake')
   )
 }}
 

@@ -34,7 +34,7 @@ where e.is_bot = false
     -- days far older than the trailing window, and anchoring on current_date alone
     -- would silently drop them from this table.
     and date(e.derived_tstamp) >= least(
-      cast({{ dbt.dateadd('day', -var('late_data_window_days', 3), 'current_date') }} as date),
+      cast({{ dbt.dateadd('day', -(var('late_data_window_days', 3) | int), 'current_date') }} as date),
       coalesce((select min(date(derived_tstamp)) from {{ base_events_this_run }}), current_date)
     )
   {% endif %}

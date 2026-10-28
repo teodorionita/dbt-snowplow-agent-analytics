@@ -21,7 +21,10 @@ A standalone dbt project that installs the package from `../`, seeds a fixed eve
 The `pr_tests` GitHub Actions workflow runs this suite for branches in the package
 repository and supports manual runs. Each run uses its own schema suffix and cleans up
 afterwards. Fork PRs need a maintainer to test a reviewed branch in the package repository,
-where the warehouse service credentials are available. The matrix covers Snowflake, BigQuery, and Databricks.
+where the warehouse service credentials are available. The matrix covers Snowflake, BigQuery, and Databricks. The Snowflake job also builds
+and tests the conformed dimensions and semantic view using the integration project’s
+`dbt_semantic_view` dependency. Numeric window variables are supplied as strings to
+exercise configuration coercion.
 
 ```bash
 cd integration_tests

@@ -225,7 +225,7 @@ vars:
     # device-clock skew (derived_tstamp months before collector_tstamp) are kept and
     # exercise the daily tables' lower bound.
     dbt_start_date: '2024-01-01'
-    late_data_window_days: 3
+    late_data_window_days: '3'
 
     # Determinism. page_summary / operator_summary compute their 7/30/90d windows from
     # as_of_date(), which is normally date_trunc('week', current_date) -- so expected
@@ -235,7 +235,7 @@ vars:
     snowplow__as_of_date: '2026-08-17'
     # The post-hook prune compares as_of_date against current_date, so a pinned
     # as_of_date would be pruned once real time moves 26 weeks past it.
-    summary_snapshot_retention_weeks: 99999
+    summary_snapshot_retention_weeks: '99999'
 
     orphan_agent_hits_threshold: 10
     orphan_human_pageviews_threshold: 5
