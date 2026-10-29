@@ -302,9 +302,20 @@ medium. BigQuery partitions `base_events` by `load_tstamp`; Databricks partition
 `load_tstamp_date` and uses that date for its incremental target predicate. Adding fields
 to an upstream entity does not change the durable table's schema.
 
-If you have run an earlier revision that stored raw entity columns, rebuild the whole
-package to populate the extracted fields for historical events. An incremental run stops
-with an upgrade error until this rebuild is performed. New installations need no extra step.
+If you have run an earlier revision that stored raw entity columns, migrate the existing
+Snowflake base table in place or rebuild the whole package to populate the extracted
+fields for historical events. An incremental run stops with an upgrade error until the
+base table has the required columns. New installations need no extra step.
+
+For existing Snowflake installations, the
+[Agent Analytics migration guide](https://docs.snowplow.io/docs/modeling-your-data/modeling-your-data-with-dbt/migration-guides/agent-analytics/)
+documents an in-place alternative that uses the retained entity values in `base_events`.
+Pause package runs, clone the table for backup, and rewrite its 19 scalar columns using
+the documented SQL. Verify the migrated data before resuming normal incremental runs.
+Keep the existing manifest and source lookup; this path does not require raw source
+history or a full refresh. The guide also covers table properties and rollback.
+
+Use the following whole-package rebuild as an alternative when source history is available.
 
 Before rebuilding, back up the existing outputs and confirm that the source retains all
 history from `snowplow__start_date`. If it does not, preserve the existing tables and plan

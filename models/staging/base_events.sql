@@ -24,9 +24,10 @@
   {%- set columns = adapter.get_columns_in_relation(this) | map(attribute='name') | map('lower') | list -%}
   {%- if 'utm_source' not in columns or 'utm_medium' not in columns or 'load_tstamp_date' not in columns -%}
     {{ exceptions.raise_compiler_error(
-      "Agent Analytics base_events needs a coordinated package rebuild to populate extracted entity fields. "
-      ~ "Follow the README upgrade instructions: retain source history, then run the whole package with "
-      ~ "--full-refresh and snowplow__allow_refresh: true. Do not refresh base_events alone."
+      "Agent Analytics base_events needs an upgrade to populate extracted entity fields. "
+      ~ "Follow the README upgrade instructions: migrate an existing Snowflake base table in place, "
+      ~ "or retain source history and rebuild the whole package with --full-refresh and "
+      ~ "snowplow__allow_refresh: true. Do not full-refresh base_events alone."
     ) }}
   {%- endif -%}
 {%- endif -%}
