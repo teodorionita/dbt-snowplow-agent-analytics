@@ -31,6 +31,19 @@ integration test fixture on every push to `main` (`.github/workflows/publish-gh-
   - `utm_referrer/1-0-0` entity — UTM-based referral attribution (falls back to `refr_*` fields)
   - [Event fingerprint](https://docs.snowplow.io/docs/pipeline/enrichments/available-enrichments/event-fingerprint-enrichment/) — strongly recommended for CDN-side dedup; without it CDN dedup falls back to `event_id` and `assert_cdn_event_fingerprint_populated` warns
 
+## Installation
+
+Add the package to your project's `packages.yml`, then run `dbt deps`:
+
+```yaml
+packages:
+  - git: "https://github.com/snowplow-incubator/dbt-snowplow-agent-analytics.git"
+    revision: "0.2.0"
+```
+
+Existing installations must follow the [upgrade instructions](#upgrade-existing-base-tables)
+before running this version.
+
 ## Warehouse source formats
 
 Use the Snowplow loader's native events table, including `load_tstamp`:
